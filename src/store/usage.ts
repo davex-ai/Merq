@@ -1,10 +1,4 @@
-type UsageRecord = {
-  model: string;
-  tokens: number;
-  cost: number;
-  timestamp: number;
-};
-
+import type { UsageRecord } from '../types/openai.js'
 const usage: UsageRecord[] = [];
 
 export function logUsage(record: UsageRecord) {
