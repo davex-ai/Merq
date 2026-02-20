@@ -1,6 +1,6 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
 import { calculateCost } from "./pricing.js";
-import { logUsage } from "../store/usage.js";
+import { logUsage } from "../../store/usage.js";
 
 export async function proxyOpenAI(
   req: FastifyRequest,

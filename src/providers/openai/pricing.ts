@@ -1,5 +1,5 @@
-import type { OpenAIModel } from '../types/openai.js'
-import type { ModelPricing } from '../types/openai.js'
+import type { OpenAIModel } from '../../types/openai.js'
+import type { ModelPricing } from '../../types/openai.js'
 
 export function calculateCost(
   model: OpenAIModel,

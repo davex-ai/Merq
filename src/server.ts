@@ -1,5 +1,5 @@
 import Fastify from "fastify";
-import { proxyOpenAI } from "./proxy/openai.js";
+import { proxyOpenAI } from "./providers/openai/openai.js";
 
 const app = Fastify({ logger: true });
 
