@@ -1,21 +1,14 @@
-import type { Provider } from "../types.js";
+import type { Provider } from "../providers/types.js";
 import type { UsageRecord } from "../store/usage.js";
-import { logUsage } from "../../store/usage.js";
+import type{ AnthropicModel } from '../types/anthropic.js'
+import { logUsage } from "../store/usage.js";
+import { pricing, AnthropicProviderName  } from '../types/anthropic.js'
+tokenAmount
 
-// Example: Anthropic models & pricing
-export type AnthropicModel = "claude-1" | "claude-2";
-
-const pricing: Record<AnthropicModel, { input: number; output: number }> = {
-  "claude-1": { input: 0.10, output: 0.40 },
-  "claude-2": { input: 0.20, output: 0.80 },
-};
-
-function isAnthropicModel(model: string): model is AnthropicModel {
-  return model in pricing;
-}
+function isAnthropicModel(model: string): model is AnthropicModel { return model in pricing }
 
 export const AnthropicProvider: Provider = {
-  name: "anthropic",
+  name: AnthropicProviderName,
 
   calculateCost: (usage, model) => {
     if (!isAnthropicModel(model)) {
@@ -23,8 +16,8 @@ export const AnthropicProvider: Provider = {
     }
     const p = pricing[model];
     return (
-      (usage.prompt_tokens / 1_000_000) * p.input +
-      (usage.completion_tokens / 1_000_000) * p.output
+      (usage.prompt_tokens / tokenAmount) * p.input +
+      (usage.completion_tokens / tokenAmount) * p.output
     );
   },
 

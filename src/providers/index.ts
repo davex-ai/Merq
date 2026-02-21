@@ -1,11 +1,11 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
 import type { Provider } from "./types.js";
 import { OpenAIProvider } from "../openai/provider.js";
-// import { AnthropicProvider } from "./anthropic/provider.js"; // future
+import { AnthropicProvider } from "../anthropic/provider.js"; 
 
 export const providers: Record<string, Provider> = {
   openai: OpenAIProvider,
-  // anthropic: AnthropicProvider,
+  anthropic: AnthropicProvider,
 };
 
 export async function handleProviderRequest(
