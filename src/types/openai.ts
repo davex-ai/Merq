@@ -1,5 +1,4 @@
 export const OpenAIProviderName  = "openai"
-// export type OpenAIModel = "gpt-4o-mini";
 export type OpenAIModel = "gpt-4o-mini" | "gpt-4o" | "gpt-3.5-turbo" ;
 
 export type ModelPricing = {
@@ -13,7 +12,6 @@ export type UsageRecord = {
   cost: number;
   timestamp: number;
 };
-
 
 export const pricing: Record<OpenAIModel, ModelPricing> = {
   "gpt-4o-mini": { input: 0.15, output: 0.60 },
