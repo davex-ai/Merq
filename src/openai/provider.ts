@@ -4,6 +4,7 @@ import type { OpenAIModel,  } from "../types/openai.js";
 import { logUsage } from "../store/usage.js";
 import type { UsageRecord } from "../store/usage.js";
 import { pricing, OpenAIProviderName  } from '../types/openai.js'
+import { tokenAmount } from '../constants.js'
 
 function isOpenAIModel(model :string) :model is OpenAIModel{ return model in pricing }
 
@@ -17,8 +18,8 @@ export const OpenAIProvider: Provider = {
 
     const p = pricing[model];
     return (
-      (usage.prompt_tokens / 1_000_000) * p.input +
-      (usage.completion_tokens / 1_000_000) * p.output
+      (usage.prompt_tokens / tokenAmount) * p.input +
+      (usage.completion_tokens / tokenAmount) * p.output
     );
   },
 

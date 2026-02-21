@@ -1,3 +1,4 @@
+//server.ts
 import Fastify from "fastify";
 import { handleProviderRequest } from "./providers/index.js";
 

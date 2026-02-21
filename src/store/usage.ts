@@ -10,7 +10,7 @@ export function getUsageByApiKey(apiKeyId: string) {
 }
 
 export function getTotalCostByKey(apiKeyId: string): number{
-    return usage.filter(record => record.apiKeyId === apiKeyId)
+    return usage.filter(record => record.apiKeyId === apiKeyId) //wait so we stoe aonly last 6  char in apikey?? how do we know it valid? how do we know it works?
     .reduce((sum, record) => sum + record.cost, 0)
 }
 

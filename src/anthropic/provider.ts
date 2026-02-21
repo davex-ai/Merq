@@ -1,9 +1,12 @@
+//anthrpic/provider
 import type { Provider } from "../providers/types.js";
 import type { UsageRecord } from "../store/usage.js";
 import type{ AnthropicModel } from '../types/anthropic.js'
 import { logUsage } from "../store/usage.js";
 import { pricing, AnthropicProviderName  } from '../types/anthropic.js'
-tokenAmount
+import { tokenAmount } from '../constants.js'
+
+
 
 function isAnthropicModel(model: string): model is AnthropicModel { return model in pricing }
 
@@ -40,7 +43,7 @@ export const AnthropicProvider: Provider = {
 
     const usage = (data as any).usage;
     if (usage) {
-      const model = (req.body as any).model || "claude-1";
+      const model = (req.body as any).model || "Claude Haiku 4.5";
       const cost = AnthropicProvider.calculateCost(usage, model);
 
       logUsage({
