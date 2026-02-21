@@ -1,5 +1,6 @@
+//openai/pricing.ts
+import { pricing } from '../types/openai.js'
 import type { OpenAIModel } from '../types/openai.js'
-import type { ModelPricing } from '../types/openai.js'
 
 export function calculateCost(
   model: OpenAIModel,
@@ -13,10 +14,3 @@ export function calculateCost(
   );
 }
 
-const pricing: Record<OpenAIModel, ModelPricing> = {
-  "gpt-4o-mini": { 
-    
-    input: 0.15,
-    output: 0.60,
-  },
-};

@@ -1,5 +1,4 @@
 import type { FastifyRequest, FastifyReply } from "fastify";
-import type { UsageRecord } from "../types/openai.js";
 
 export interface Provider {
   name: string;
