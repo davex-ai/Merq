@@ -1,13 +1,14 @@
 //openai/provider.ts
 import type { Provider } from "../providers/types.js";
-import type { OpenAIModel, UsageRecord } from "../types/openai.js";
+import type { OpenAIModel,  } from "../types/openai.js";
 import { logUsage } from "../store/usage.js";
+import type { UsageRecord } from "../store/usage.js";
 import { pricing, OpenAIProviderName  } from '../types/openai.js'
 
 function isOpenAIModel(model :string) :model is OpenAIModel{ return model in pricing }
 
 export const OpenAIProvider: Provider = {
-  name: OpenAIProviderName ,
+  name: OpenAIProviderName,
 
   calculateCost: (usage, model) => {
     if (!isOpenAIModel(model)) {
@@ -24,11 +25,13 @@ export const OpenAIProvider: Provider = {
   proxyRequest: async (req, reply) => {
     const path = req.url.replace("/merq/openai", "");
     const openaiUrl = `https://api.openai.com${path}`;
+    const auth = req.headers.authorization
+    const apiKeyId = auth ? auth.slice(-6) : "unknown"
 
     const res = await fetch(openaiUrl, {
       method: req.method,
       headers: {
-        "Authorization": req.headers.authorization!,
+        "Authorization":auth!,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(req.body),
@@ -42,6 +45,8 @@ export const OpenAIProvider: Provider = {
       const cost = OpenAIProvider.calculateCost(usage, model);
 
       logUsage({
+        provider: OpenAIProviderName,
+        apiKeyId,
         model,
         tokens: usage.total_tokens,
         cost,

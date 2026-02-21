@@ -7,13 +7,6 @@ export type ModelPricing = {
   output: number;
 };
 
-export type UsageRecord = {
-  model: string;
-  tokens: number;
-  cost: number;
-  timestamp: number;
-};
-
 export const pricing: Record<OpenAIModel, ModelPricing> = {
   "gpt-4o-mini": { input: 0.15, output: 0.60 },
   "gpt-4o":      { input: 5.00, output: 15.00 },
