@@ -4,15 +4,17 @@ import type { OpenAIModel, UsageRecord } from "../types/openai.js";
 import { logUsage } from "../store/usage.js";
 import { pricing, OpenAIProviderName  } from '../types/openai.js'
 
+function isOpenAIModel(model :string) :model is OpenAIModel{ return model in pricing }
+
 export const OpenAIProvider: Provider = {
   name: OpenAIProviderName ,
 
   calculateCost: (usage, model) => {
-    if (!(model in pricing)) {
+    if (!isOpenAIModel(model)) {
       throw new Error(`Unknown OpenAI model: ${model}`);
     }
 
-    const p = pricing[model as OpenAIModel];
+    const p = pricing[model];
     return (
       (usage.prompt_tokens / 1_000_000) * p.input +
       (usage.completion_tokens / 1_000_000) * p.output

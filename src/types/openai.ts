@@ -1,4 +1,5 @@
-export const OpenAIProviderName  = "openai"
+export const OpenAIProviderName  = "openai" as const
+export type OpenAIProviderName  = typeof OpenAIProviderName
 export type OpenAIModel = "gpt-4o-mini" | "gpt-4o" | "gpt-3.5-turbo" ;
 
 export type ModelPricing = {
