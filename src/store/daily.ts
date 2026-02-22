@@ -37,3 +37,9 @@ export function getDailyUsage(apiKeyId: string, date?: string) {
     d.apiKeyId === apiKeyId && (!date || d.date === date)
   );
 }
+
+export function getMonthlyUsage(apiKeyId: string, month?: string) {
+  return Object.values(daily).filter(d =>
+    d.apiKeyId === apiKeyId && (!month || d.date.startsWith(month))
+  );
+}

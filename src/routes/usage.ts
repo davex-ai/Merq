@@ -1,11 +1,20 @@
 import type { FastifyInstance } from "fastify";
-import { getDailyUsage } from "../store/daily.js";
+import { getDailyUsage, getMonthlyUsage } from "../store/daily.js";
 
-export async function usuageRoute(app:FastifyInstance) {
+export async function dailyUsageRoute(app:FastifyInstance) {
     app.get("usage/daily/:apiKeyId", async (req) => {
         const { apiKeyId } = req.params as { apiKeyId: string}
         const { date }  = req.params as { date?: string}
 
         return getDailyUsage(apiKeyId, date)
+    })
+}
+
+export async function monthlyUsageRoute(app:FastifyInstance) {
+    app.get("usage/monthly/:apiKeyId", async (req) => {
+        const { apiKeyId } = req.params as { apiKeyId: string}
+        const { date }  = req.params as { date?: string}
+
+        return getMonthlyUsage(apiKeyId, date)
     })
 }
