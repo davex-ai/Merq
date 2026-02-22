@@ -15,8 +15,29 @@ export function getUsageByApiKey(apiKeyId: string) {
   return usage.filter(record => record.apiKeyId === apiKeyId);
 }
 
+export function getDailyCost(apiKeyId: string, date: string): number {
+  return usage
+    .filter(
+      u =>
+        u.apiKeyId === apiKeyId &&
+        new Date(u.timestamp).toISOString().slice(0, 10) === date
+    )
+    .reduce((sum, u) => sum + u.cost, 0);
+}
+
+export function getMonthlyCost(apiKeyId: string, yearMonth: string): number {
+  return usage
+    .filter(
+      u =>
+        u.apiKeyId === apiKeyId &&
+        new Date(u.timestamp).toISOString().slice(0, 7) === yearMonth
+    )
+    .reduce((sum, u) => sum + u.cost, 0);
+}
+
+
 export function getTotalCostByKey(apiKeyId: string): number{
-    return usage.filter(record => record.apiKeyId === apiKeyId) //wait so we stoe aonly last 6  char in apikey?? how do we know it valid? how do we know it works?
+    return usage.filter(record => record.apiKeyId === apiKeyId)
     .reduce((sum, record) => sum + record.cost, 0)
 }
 
