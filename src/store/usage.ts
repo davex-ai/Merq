@@ -1,14 +1,16 @@
 import { toUTCDateString } from "../constants.js";
+import { checkSoftAlerts } from "./alerts.js";
 import { addDailyUsage } from "./daily.js";
 
 const usage: UsageRecord[] = [];
 
-export function logUsage(record: UsageRecord) {
+export async function logUsage(record: UsageRecord)  {
   usage.push(record);
 
   const date = toUTCDateString(record.timestamp)
-  addDailyUsage(record.apiKeyId, date, record.cost, record.tokens)
+  await addDailyUsage(record.apiKeyId, date, record.cost, record.tokens)
   console.log("USAGE LOGGED:", record);
+  await checkSoftAlerts(record.apiKeyId)
 }
 
 export function getUsageByApiKey(apiKeyId: string) {

@@ -4,7 +4,8 @@ export type Budget = {
   apiKeyId: string;
   dailyLimitUsd?: number;
   monthlyLimitUsd?: number;
-  alertThresholds?: number[] ;
+  alertThresholds?: number[];
+  webhookUrl?: string;
 }
 
 const budgets: Budget[] = [];
@@ -13,7 +14,7 @@ export function setBudget(budget: Budget) {
   budgets.push(budget);
 }
 
-function getBudget(apiKeyId: string): Budget | undefined {
+export function getBudget(apiKeyId: string): Budget | undefined {
   return budgets.find(b => b.apiKeyId === apiKeyId);
 }
 
