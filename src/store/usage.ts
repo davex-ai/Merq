@@ -1,7 +1,13 @@
+import { toUTCDateString } from "../constants.js";
+import { addDailyUsage } from "./daily.js";
+
 const usage: UsageRecord[] = [];
 
 export function logUsage(record: UsageRecord) {
   usage.push(record);
+
+  const date = toUTCDateString(record.timestamp)
+  addDailyUsage(record.apiKeyId, date, record.cost, record.tokens)
   console.log("USAGE LOGGED:", record);
 }
 
