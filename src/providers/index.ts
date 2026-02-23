@@ -3,6 +3,7 @@ import type { Provider } from "./types.js";
 import { OpenAIProvider } from "../openai/provider.js";
 import { AnthropicProvider } from "../anthropic/provider.js";
 import { checkDailyBudget, checkMonthlyBudget } from "../store/budgets.js";
+import { checkRateLimit } from "../store/rateLimit.js";
 
 export const providers: Record<string, Provider> = {
   openai: OpenAIProvider,
@@ -21,6 +22,12 @@ export async function handleProviderRequest(
 
   const auth = req.headers.authorization;
   const apiKeyId = auth ? auth.slice(-6) : "unknown";
+
+   try {
+    checkRateLimit(apiKeyId, 60);  
+  } catch {
+    return reply.status(429).send({ error: "Rate limit exceeded" });
+  }
 
   try {
     checkDailyBudget(apiKeyId);

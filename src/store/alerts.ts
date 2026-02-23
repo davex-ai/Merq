@@ -11,15 +11,15 @@ function markAlertFired(key: string) {
 }
 
 
-export async function checkSoftAlerts(apiKeyId: string) {
+export async function checkDailySoftAlerts(apiKeyId: string) {
   const budget = getBudget(apiKeyId);
-  if (!budget?.dailyLimitUsd || !budget?.monthlyLimitUsd || !budget.alertThresholds) return
+  if (!budget?.alertThresholds) return
 
   const today = new Date().toISOString().slice(0, 10)
   const spent = getDailyCost(apiKeyId, today)
 
   for (const threshold of budget.alertThresholds) {
-    const ratio = spent / budget.dailyLimitUsd
+    const ratio = budget.dailyLimitUsd ? spent / budget.dailyLimitUsd : 0;
     const alertKey = `${apiKeyId}:${today}:${threshold}`;
 
     if (ratio >= threshold && !hasAlertFired(alertKey)) {
