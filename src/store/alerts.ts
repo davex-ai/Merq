@@ -48,3 +48,41 @@ export async function checkDailySoftAlerts(apiKeyId: string) {
     }
   }
 }
+
+export async function checkMonthlySoftAlerts(apiKeyId: string) {
+  const budget = getBudget(apiKeyId);
+  if (!budget?.alertThresholds) return
+
+  const month = new Date().toISOString().slice(0, 7)
+  const spent = getMonthlyCost(apiKeyId, month)
+
+  for (const threshold of budget.alertThresholds) {
+    const ratio = budget.monthlyLimitUsd ? spent / budget.monthlyLimitUsd : 0;
+    const alertKey = `${apiKeyId}:${month}:${threshold}`;
+
+    if (ratio >= threshold && !hasAlertFired(alertKey)) {
+      console.log(
+        `[ALERT] API key ${apiKeyId} reached ${Math.round(
+          ratio * 100
+        )}% of monthly budget`
+      );
+
+      // Optional webhook
+      if (budget.webhookUrl) {
+        fetch(budget.webhookUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            apiKeyId,
+            threshold,
+            spent,
+            limit: budget.dailyLimitUsd,
+            date: month,
+          }),
+        }).catch(() => {});
+      }
+
+      markAlertFired(alertKey);
+    }
+  }
+}
