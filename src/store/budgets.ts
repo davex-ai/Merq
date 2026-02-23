@@ -25,7 +25,7 @@ export function checkDailyBudget(apiKeyId: string) {
   const today = new Date().toISOString().slice(0, 10);
   const spent = getDailyCost(apiKeyId, today);
 
-  if (spent >= budget.dailyLimitUsd) {
+  if (spent >= budget.dailyLimitUsd) {//>= cant be used here . (promise, number)
     throw new Error("Daily budget exceeded");
   }
 }
@@ -37,7 +37,7 @@ export function checkMonthlyBudget(apiKeyId: string) {
   const month = new Date().toISOString().slice(0, 7);
   const spent = getMonthlyCost(apiKeyId, month);
 
-  if (spent >= budget.monthlyLimitUsd) {
+  if (spent >= budget.monthlyLimitUsd) {//>= cant be used here . (promise, number)
     throw new Error("Monthly budget exceeded");
   }
 }

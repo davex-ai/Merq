@@ -57,7 +57,7 @@ export async function checkMonthlySoftAlerts(apiKeyId: string) {
   const spent = getMonthlyCost(apiKeyId, month)
 
   for (const threshold of budget.alertThresholds) {
-    const ratio = budget.monthlyLimitUsd ? spent / budget.monthlyLimitUsd : 0;
+    const ratio = budget.monthlyLimitUsd ? spent / budget.monthlyLimitUsd : 0; bug here
     const alertKey = `${apiKeyId}:${month}:${threshold}`;
 
     if (ratio >= threshold && !hasAlertFired(alertKey)) {
