@@ -1,5 +1,5 @@
 import { getDailyCost, getMonthlyCost } from "./usage.js";
-
+//budget doesnt sore in db
 export type Budget = {
   apiKeyId: string;
   dailyLimitUsd?: number;
@@ -18,26 +18,27 @@ export function getBudget(apiKeyId: string): Budget | undefined {
   return budgets.find(b => b.apiKeyId === apiKeyId);
 }
 
-export function checkDailyBudget(apiKeyId: string) {
+// store/budgets.ts
+export async function checkDailyBudget(apiKeyId: string) {
   const budget = getBudget(apiKeyId);
   if (!budget?.dailyLimitUsd) return;
 
   const today = new Date().toISOString().slice(0, 10);
-  const spent = getDailyCost(apiKeyId, today);
+  const spent = await getDailyCost(apiKeyId, today);
 
-  if (spent >= budget.dailyLimitUsd) {//>= cant be used here . (promise, number)
-    throw new Error("Daily budget exceeded");
+  if (spent >= budget.dailyLimitUsd) {
+    throw new Error("DAILY_BUDGET_EXCEEDED");
   }
 }
 
-export function checkMonthlyBudget(apiKeyId: string) {
+export async function checkMonthlyBudget(apiKeyId: string) {
   const budget = getBudget(apiKeyId);
   if (!budget?.monthlyLimitUsd) return;
 
   const month = new Date().toISOString().slice(0, 7);
-  const spent = getMonthlyCost(apiKeyId, month);
+  const spent = await getMonthlyCost(apiKeyId, month);
 
-  if (spent >= budget.monthlyLimitUsd) {//>= cant be used here . (promise, number)
-    throw new Error("Monthly budget exceeded");
+  if (spent >= budget.monthlyLimitUsd) {
+    throw new Error("MONTHLY_BUDGET_EXCEEDED");
   }
 }

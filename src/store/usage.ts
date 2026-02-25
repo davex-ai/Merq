@@ -1,7 +1,5 @@
-import { pool, toUTCDateString } from "../constants.js";
+import { pool } from "../constants.js";
 import { checkDailySoftAlerts, checkMonthlySoftAlerts } from "./alerts.js";
-
-const usage: UsageRecord[] = [];
 
 export async function logUsage(record: UsageRecord)  {
    const totalTokens = record.promptTokens + record.completionTokens;
@@ -24,7 +22,6 @@ export async function logUsage(record: UsageRecord)  {
     ]
   );
 
-  // Daily aggregation
   await pool.query(
     `
     INSERT INTO daily_usage (api_key_id, date, total_tokens, total_cost_usd)
@@ -37,7 +34,6 @@ export async function logUsage(record: UsageRecord)  {
     [record.apiKeyId, totalTokens, record.cost]
   );
 
-  // Monthly aggregation
   await pool.query(
     `
     INSERT INTO monthly_usage (api_key_id, month, total_tokens, total_cost_usd)
@@ -50,15 +46,30 @@ export async function logUsage(record: UsageRecord)  {
     [record.apiKeyId, totalTokens, record.cost]
   );
 
-  const date = toUTCDateString(record.timestamp)
-  addDailyUsage(record.apiKeyId, date, record.cost, totalTokens)
   console.log("USAGE LOGGED:", record);
   await checkDailySoftAlerts(record.apiKeyId)
   await checkMonthlySoftAlerts(record.apiKeyId)
 }
 
-export function getUsageByApiKey(apiKeyId: string) {
-  return usage.filter(record => record.apiKeyId === apiKeyId);
+export async function getUsageByApiKey(apiKeyId: string) {
+  const res = await pool.query(
+    `
+    SELECT
+      provider,
+      model,
+      prompt_tokens,
+      completion_tokens,
+      total_tokens,
+      cost_usd,
+      created_at
+    FROM usage_events
+    WHERE api_key_id = $1
+    ORDER BY created_at DESC
+    `,
+    [apiKeyId]
+  );
+
+  return res.rows;
 }
 
 export async function getDailyCost(apiKeyId: string, date: string) {
@@ -88,9 +99,17 @@ export async function getMonthlyCost(apiKeyId: string, month: string) {
 }
 
 
-export function getTotalCostByKey(apiKeyId: string): number{
-    return usage.filter(record => record.apiKeyId === apiKeyId)
-    .reduce((sum, record) => sum + record.cost, 0)
+export async function getTotalCostByKey(apiKeyId: string): Promise<number> {
+  const res = await pool.query(
+    `
+    SELECT COALESCE(SUM(cost_usd), 0) AS total
+    FROM usage_events
+    WHERE api_key_id = $1
+    `,
+    [apiKeyId]
+  );
+
+  return Number(res.rows[0].total);
 }
 
 export type UsageRecord = {
@@ -110,41 +129,37 @@ type DailyAggregate = {
   totalTokens: number;
 };
 
-const daily: Record<string, DailyAggregate> = {};
-
 function makeKey(apiKeyId: string, date: string) {
   return `${apiKeyId}:${date}`;
 }
 
-export function addDailyUsage(
-  apiKeyId: string,
-  date: string,
-  cost: number,
-  tokens: number
-) {
-  const key = makeKey(apiKeyId, date);
 
-  if (!daily[key]) {
-    daily[key] = {
-      apiKeyId,
-      date,
-      totalCost: 0,
-      totalTokens: 0,
-    };
-  }
+export async function getDailyUsage(apiKeyId: string, date?: string) {
+  const res = await pool.query(
+    `
+    SELECT date, total_tokens, total_cost_usd
+    FROM daily_usage
+    WHERE api_key_id = $1
+    ${date ? "AND date = $2" : ""}
+    ORDER BY date DESC
+    `,
+    date ? [apiKeyId, date] : [apiKeyId]
+  );
 
-  daily[key].totalCost += cost;
-  daily[key].totalTokens += tokens;
+  return res.rows;
 }
 
-export function getDailyUsage(apiKeyId: string, date?: string) {
-  return Object.values(daily).filter(d =>
-    d.apiKeyId === apiKeyId && (!date || d.date === date)
+export async function getMonthlyUsage(apiKeyId: string, month?: string) {
+  const res = await pool.query(
+    `
+    SELECT month, total_tokens, total_cost_usd
+    FROM monthly_usage
+    WHERE api_key_id = $1
+    ${month ? "AND month = $2" : ""}
+    ORDER BY month DESC
+    `,
+    month ? [apiKeyId, `${month}-01`] : [apiKeyId]
   );
-}
 
-export function getMonthlyUsage(apiKeyId: string, month?: string) {
-  return Object.values(daily).filter(d =>
-    d.apiKeyId === apiKeyId && (!month || d.date.startsWith(month))
-  );
+  return res.rows;
 }

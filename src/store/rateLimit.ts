@@ -3,6 +3,7 @@ type RateEntry = {
   count: number;
   resetAt: number;
 };
+//ratelimits doesnt sore in db
 
 const limits = new Map<string, RateEntry>();
 

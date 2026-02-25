@@ -16,7 +16,7 @@ export async function checkDailySoftAlerts(apiKeyId: string) {
   if (!budget?.alertThresholds) return
 
   const today = new Date().toISOString().slice(0, 10)
-  const spent = getDailyCost(apiKeyId, today)
+  const spent = await getDailyCost(apiKeyId, today)
 
   for (const threshold of budget.alertThresholds) {
     const ratio = budget.dailyLimitUsd ? spent / budget.dailyLimitUsd : 0;
@@ -54,10 +54,10 @@ export async function checkMonthlySoftAlerts(apiKeyId: string) {
   if (!budget?.alertThresholds) return
 
   const month = new Date().toISOString().slice(0, 7)
-  const spent = getMonthlyCost(apiKeyId, month)
+  const spent = await getMonthlyCost(apiKeyId, month)
 
   for (const threshold of budget.alertThresholds) {
-    const ratio = budget.monthlyLimitUsd ? spent / budget.monthlyLimitUsd : 0; bug here
+    const ratio = budget.monthlyLimitUsd ? spent / budget.monthlyLimitUsd : 0;
     const alertKey = `${apiKeyId}:${month}:${threshold}`;
 
     if (ratio >= threshold && !hasAlertFired(alertKey)) {
