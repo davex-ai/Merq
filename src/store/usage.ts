@@ -85,31 +85,9 @@ export async function getDailyCost(apiKeyId: string, date: string) {
   return res.rows[0]?.total_cost_usd ?? 0;
 }
 
-export async function getMonthlyCost(apiKeyId: string, month: string) {
-  const res = await pool.query(
-    `
-    SELECT total_cost_usd
-    FROM monthly_usage
-    WHERE api_key_id = $1 AND month = $2
-    `,
-    [apiKeyId, `${month}-01`]
-  );
-
-  return res.rows[0]?.total_cost_usd ?? 0;
-}
-
-
-export async function getTotalCostByKey(apiKeyId: string): Promise<number> {
-  const res = await pool.query(
-    `
-    SELECT COALESCE(SUM(cost_usd), 0) AS total
-    FROM usage_events
-    WHERE api_key_id = $1
-    `,
-    [apiKeyId]
-  );
-
-  return Number(res.rows[0].total);
+export function getTotalCostByKey(apiKeyId: string): number{
+    return usage.filter(record => record.apiKeyId === apiKeyId) 
+    .reduce((sum, record) => sum + record.cost, 0)
 }
 
 export type UsageRecord = {
