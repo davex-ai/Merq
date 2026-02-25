@@ -49,10 +49,11 @@ export const OpenAIProvider: Provider = {
         provider: OpenAIProviderName,
         apiKeyId,
         model,
-        tokens: usage.total_tokens,
+        promptTokens: usage.promptTokens,
+        completionTokens: usage.completionTokens,
         cost,
         timestamp: Date.now(),
-      } as UsageRecord);
+      });
     }
 
     reply.status(res.status).send(data);
