@@ -12,8 +12,8 @@ export async function logUsage(record: UsageRecord)  {
     VALUES ($1,$2,$3,$4,$5,$6,$7)
     `,
     [
-      record.apiKeyId,
       record.provider,
+      record.apiKeyId,
       record.model,
       record.promptTokens,
       record.completionTokens,

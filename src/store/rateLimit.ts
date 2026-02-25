@@ -3,30 +3,25 @@ type RateEntry = {
   count: number;
   resetAt: number;
 };
-//ratelimits doesnt sore in db
 
-const limits = new Map<string, RateEntry>();
+import Redis from "ioredis";
 
-export function checkRateLimit(
+export const redis = new Redis(process.env.REDIS_URL)
+
+export async function checkRateLimit(
   apiKeyId: string,
   limitPerMinute: number
 ) {
-  const now = Date.now();
-  const windowMs = 60_000;
+  const minute = Math.floor(Date.now() / 60000);
+  const key = `rate:${apiKeyId}:${minute}`;
 
-  const entry = limits.get(apiKeyId);
+  const count = await redis.incr(key);
 
-  if (!entry || entry.resetAt < now) {
-    limits.set(apiKeyId, {
-      count: 1,
-      resetAt: now + windowMs,
-    });
-    return;
+  if (count === 1) {
+    await redis.expire(key, 60);
   }
 
-  if (entry.count >= limitPerMinute) {
-    throw new Error("Rate limit exceeded");
+  if (count > limitPerMinute) {
+    throw new Error("RATE_LIMIT_EXCEEDED");
   }
-
-  entry.count += 1;
 }
